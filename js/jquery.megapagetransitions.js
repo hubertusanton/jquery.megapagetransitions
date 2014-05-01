@@ -11,16 +11,17 @@
 	$.megaPageTransitions = function (el, options) {
 		
 		var defaults = {
-			useNextPrevNav: true,
-			useDirectNav: true,
-			selectorNextPrevNav: '#navs',
-			selectorDirectNav: '#direct-navs',
-			animSpeed : 1,
-			onBeforeStart: function () {},
-			onBeforeDirectNav: function () {},
-			onAfterDirectNav: function () {},
-			onBeforeMoveNextArticle: function () {},
-			onBeforeMovePrevArticle: function () {}
+			useNextPrevNav: true, // wether to use next/ prev nav 
+			useDirectNav: true, // wether to use direct nav menu
+			selectorNextPrevNav: '#navs', // selection of the next prev navs: div#navs span#previous a#previous-button && div#navs span#previous a#next-button 
+			selectorDirectNav: '#direct-navs', // selection of the direct navs: #direct-navs ul#nav li a 
+			animSpeed : 1, // the speed of the transition animation
+			useNextPrevNavAutoTitles: false, // automatically set nextprev titles from directNav 
+			onBeforeStart: function () {}, // called before init
+			onBeforeDirectNav: function () {}, // called before navigation by direct nav
+			onAfterDirectNav: function () {}, // called after navigation by direct nav
+			onBeforeMoveNextArticle: function () {}, // called before next navigation
+			onBeforeMovePrevArticle: function () {} // called before prev navigation
 		};
 
 		var plugin = this;
@@ -84,6 +85,8 @@
 
 				$(this).attr('data-article-height', $(this).height());
 
+				$(this).css('overflow', 'hidden');
+
 				if (!$(this).hasClass('active')) {
 					$(this).css('height', '0');
 				}
@@ -144,10 +147,17 @@
 				return;
 			}
 
-			$next_article    = plugin.el.find('article.active').next('article');
-			$prev_article    = plugin.el.find('article.active').prev('article');
+			$next_article    = plugin.get_current_article().next('article');
+			$prev_article    = plugin.get_current_article().prev('article');
 
 			if ($next_article.is('article')) {
+				if (plugin.settings.useNextPrevNavAutoTitles && plugin.settings.useDirectNav) {
+
+					$next_article_index      = $next_article.index();
+					$next_article_link_title = $(plugin.settings.selectorDirectNav + ' ul li:eq(' + $next_article_index + ') a').html();
+					$(plugin.settings.selectorNextPrevNav + ' #next a').html($next_article_link_title);
+
+				}
 				$(plugin.settings.selectorNextPrevNav + ' #next').show();
 			}
 			else {
@@ -155,6 +165,13 @@
 			}
 
 			if ($prev_article.is('article')) {
+				if (plugin.settings.useNextPrevNavAutoTitles && plugin.settings.useDirectNav) {
+
+					$prev_article_index      = $prev_article.index();
+					$prev_article_link_title = $(plugin.settings.selectorDirectNav + ' ul li:eq(' + $prev_article_index + ') a').html();
+					$(plugin.settings.selectorNextPrevNav + ' #previous a').html($prev_article_link_title);
+
+				}				
 				$(plugin.settings.selectorNextPrevNav + ' #previous').show();
 			}
 			else {
@@ -179,7 +196,7 @@
 
 			if ($to_article.is('article')) {
 				
-				$current_article = plugin.el.find('article.active');
+				$current_article = plugin.get_current_article();
 
 				// if currently active item is chosen do nothing
 				if ($current_article.is($to_article)) {
@@ -243,7 +260,7 @@
 
 			if ($prev_article.is('article')) {
 				
-				$current_article = plugin.el.find('article.active');
+				$current_article = plugin.get_current_article();
 				
 				scroll_top();
 
@@ -292,11 +309,11 @@
 
 			$anim_speed = plugin.settings.animSpeed;
 			
-			$next_article    = plugin.el.find('article.active').next('article');
+			$next_article    = plugin.get_current_article().next('article');
 
 			if ($next_article.is('article')) {
 				
-				$current_article = plugin.el.find('article.active');
+				$current_article = plugin.get_current_article();
 				
 				scroll_top();
 
@@ -335,6 +352,13 @@
 			}					
 		}
 
+
+		/* 
+		* public method for getting current active article
+		*/
+		plugin.get_current_article = function() {
+			return plugin.el.find('article.active');
+		}
 
 
 		init();
