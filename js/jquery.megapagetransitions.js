@@ -21,7 +21,8 @@
 			onBeforeDirectNav: function () {}, // called before navigation by direct nav
 			onAfterDirectNav: function () {}, // called after navigation by direct nav
 			onBeforeMoveNextArticle: function () {}, // called before next navigation
-			onBeforeMovePrevArticle: function () {} // called before prev navigation
+			onBeforeMovePrevArticle: function () {}, // called before prev navigation
+			onAfterRefreshNextPrevNav: function () {} // called after refresh of next prev navigation
 		};
 
 		var plugin = this;
@@ -178,7 +179,9 @@
 				$(plugin.settings.selectorNextPrevNav + ' #previous').hide();	
 			}	
 
-			scroll_top();	
+			scroll_top();
+				
+			plugin.settings.onAfterRefreshNextPrevNav.call(this);
 
 		}  
 
