@@ -1,4 +1,4 @@
-article {
+div.page {
 	margin-left: auto;
 	margin-right: auto;
 	width: 800px;
@@ -10,7 +10,6 @@ article {
 	width: 800px;
 	text-align: center;
 	background-color: #ddd;
-	display: none;
 }
 .clear { 
 	clear: both;
