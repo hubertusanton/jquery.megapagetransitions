@@ -23,6 +23,7 @@
 			onAfterDirectNav: function () {}, // called after navigation by direct nav
 			onBeforeMoveToArticle: function () {}, // called before moving to article
 			onBeforeMoveNextArticle: function () {}, // called before next navigation
+			onAfterMoveNextArticle: function () {}, // called after next navigation
 			onBeforeMovePrevArticle: function () {}, // called before prev navigation
 			onAfterRefreshNextPrevNav: function () {} // called after refresh of next prev navigation
 		};
@@ -37,6 +38,8 @@
 		plugin.document_html = $(document.documentElement);
 
 		plugin.articles      = {}
+
+		var init_load_hash = '';
 
 		// init method
 		var init = function() {
@@ -68,14 +71,8 @@
 			var destiny = value[0];
 
 			if(destiny.length){
-				var goto_anchor = $('[data-anchor="'+destiny+'"]');
-
-				if(goto_anchor.length){
-
-					var num_article = goto_anchor.index() + 1;
-					plugin.move_to_article(num_article);						
-
-				}
+					
+				plugin.init_load_hash = destiny;				
 
 			}
 
@@ -103,7 +100,7 @@
 
 			plugin.articles.each(function() {
 
-				$(this).attr('data-article-height', $(this).height() + 100);
+				$(this).attr('data-article-height', $(this).height() + 40);
 
 				$(this).css('overflow', 'hidden');
 
@@ -210,6 +207,20 @@
 
 		}  
 
+		/* 
+		* public method to move to page when init hash is set
+		*/
+		plugin.move_to_init_hash = function() {
+
+			if (plugin.init_load_hash == '') return;
+			
+			var goto_anchor = $('[data-anchor="'+plugin.init_load_hash+'"]');
+
+			if(goto_anchor.length){
+				var num_article = goto_anchor.index() + 1;
+				plugin.move_to_article(num_article);
+			}
+		}
 
 		/* 
 		* public method move_to_article
@@ -241,6 +252,7 @@
 				var to_article_height = $to_article.attr('data-article-height');
 
 				if (plugin.settings.useLightTransitions) {
+					scroll_top();					
 					$current_article.css('height', '0px');
 					$to_article.css('height', to_article_height + 'px');
 				}
@@ -286,6 +298,7 @@
 				var prev_article_height = $prev_article.attr('data-article-height');
 
 				if (plugin.settings.useLightTransitions) {
+					scroll_top();						
 					$current_article.css('height', '0px');
 					$prev_article.css('height', prev_article_height + 'px');
 				}
@@ -309,10 +322,13 @@
 					tl.insert(TweenMax.to(window, $anim_speed, {
 						scrollTo:{y:0, x:0} 
 					}));
+					
 									
-					tl.insert(TweenMax.to($current_article, $anim_speed, { 
-						height: 0
+					tl.insert(TweenMax.to($current_article, 0, { 
+						height: 0,
+						delay: $anim_speed
 					}));
+
 				
 
 					tl.play();
@@ -350,6 +366,7 @@
 				var next_article_height = $next_article.attr('data-article-height');
 				
 				if (plugin.settings.useLightTransitions) {
+					scroll_top();						
 					$current_article.css('height', '0px');
 					$next_article.css('height', next_article_height + 'px');
 				}
@@ -357,7 +374,10 @@
 
 					var tl = new TimelineLite({
 						paused: true,
-						onComplete : refresh_next_prev_nav
+						onComplete : function() {
+							plugin.settings.onAfterMoveNextArticle.call(this, $current_article);
+							refresh_next_prev_nav();
+						}
 					})
 
 					var current_article_height       = $current_article.attr('data-article-height');
@@ -370,16 +390,18 @@
 					tl.insert(TweenMax.to(window, $anim_speed, {
 						scrollTo:{y:current_article_height, x:0} 
 					}));	
+
+					tl.insert(TweenMax.to(window, 0, {
+						scrollTo:{y:0, x:0}, 
+						delay: $anim_speed
+					}));
 									
 					tl.insert(TweenMax.to($current_article, 0, { 
 						height: 0,
 						delay: $anim_speed
 					}));
 									
-					tl.insert(TweenMax.to(window, 0, {
-						scrollTo:{y:0, x:0}, 
-						delay: $anim_speed
-					}));
+
 				
 					tl.play();
 
@@ -416,13 +438,13 @@
 				//up
 				case 38:
 				case 33:
-					plugin.move_prev_article();
+					//plugin.move_prev_article();
 				break;
 
 				//down
 				case 40:
 				case 34:
-					plugin.move_next_article();
+					//plugin.move_next_article();
 				break;
 
 				default:
