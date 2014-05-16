@@ -315,22 +315,19 @@
 						height: prev_article_height + 'px'
 					}));
 
+					tl.insert(TweenMax.to($current_article, 0, { 
+						height: 0
+					}));					
+
 					tl.insert(TweenMax.to(window, 0, {
 						scrollTo:{y:prev_article_height, x:0} 
-					}));	
+					}));
 
 					tl.insert(TweenMax.to(window, $anim_speed, {
-						scrollTo:{y:0, x:0} 
+						scrollTo:{y:0, x:0},
+						ease:Sine.easeOut
 					}));
 					
-									
-					tl.insert(TweenMax.to($current_article, 0, { 
-						height: 0,
-						delay: $anim_speed
-					}));
-
-				
-
 					tl.play();
 
 				}
@@ -388,7 +385,8 @@
 					}));
 
 					tl.insert(TweenMax.to(window, $anim_speed, {
-						scrollTo:{y:current_article_height, x:0} 
+						scrollTo:{y:current_article_height, x:0,
+							ease:Sine.easeOut } 
 					}));	
 
 					tl.insert(TweenMax.to(window, 0, {
