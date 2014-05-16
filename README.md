@@ -12,7 +12,13 @@ Maintainer Contacts
 
 Requirements
 ------------
-* Jquery 1.11.0
+* [Jquery 1.11.0](http://jquery.com/)
+* [Greensock animation platform](http://www.greensock.com/gsap-js/)
+
+Example projects using this plugin
+-------------------
+* [FNV Bondgenoten Jaaroverzicht](http://www.fnvbondgenoten-jaaroverzicht.nl)
+
 
 Documentation
 -------------
